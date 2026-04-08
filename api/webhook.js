@@ -34,7 +34,8 @@ module.exports = async (req, res) => {
 
   try {
     if (text === '/start') {
-      await sendTelegram(TELEGRAM_TOKEN, chatId, "Yooo! Welcome to Streakr! 🚀\n\nI'll roast you every night at 8 PM if you haven't done your LeetCode.\n\n**Reply with your LeetCode username** to register!");
+      console.log("Handling /start command...");
+      await sendTelegram(TELEGRAM_TOKEN, chatId, "<b>Welcome to Streakr!</b> 🚀\n\nI'll check your LeetCode streak every night at 8 PM.\n\n<b>To Register:</b> Reply with JUST your LeetCode username.");
     } else {
       console.log(`Registering ${text}...`);
       
@@ -50,14 +51,14 @@ module.exports = async (req, res) => {
         throw new Error(`Database Error: ${error.message}`);
       }
 
-      await sendTelegram(TELEGRAM_TOKEN, chatId, `✅ Got it! I'm now tracking: **${text}**\n\nI'll check your streak every day at 8:00 PM IST. Stay consistent! 🏃‍♂️💨`);
+      await sendTelegram(TELEGRAM_TOKEN, chatId, `✅ <b>Successfully Registered!</b>\n\nI am now tracking: <code>${text}</code>\n\nYou'll get a reminder at 8:00 PM IST if you haven't solved a problem today.`);
     }
 
     return res.status(200).json({ status: 'success' });
 
   } catch (err) {
     console.error("Execution Error:", err.message);
-    await sendTelegram(TELEGRAM_TOKEN, chatId, `❌ Error: ${err.message}\n\nHint: Check if your Supabase RLS policies are disabled!`);
+    await sendTelegram(TELEGRAM_TOKEN, chatId, `❌ <b>Registration Error:</b> ${err.message}`);
     return res.status(200).json({ status: 'error', message: err.message });
   }
 };
@@ -67,9 +68,9 @@ async function sendTelegram(token, chatId, text) {
     await axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
       chat_id: chatId,
       text: text,
-      parse_mode: 'Markdown'
+      parse_mode: 'HTML'
     });
   } catch (err) {
-    console.error("Telegram Send Error:", err.response ? err.response.data : err.message);
+    console.error("Telegram Send Error:", err.response ? JSON.stringify(err.response.data) : err.message);
   }
 }
