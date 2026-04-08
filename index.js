@@ -95,14 +95,32 @@ async function main() {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // 2. Fetch all registered users from the database
-    const { data: users, error } = await supabase.from('users').select('*');
+    let { data: users, error } = await supabase.from('users').select('*');
 
     if (error) {
         console.error("Failed to fetch users from database:", error.message);
-        return;
+        users = []; // Fallback to empty array so default user still runs
+    } else if (!users) {
+        users = [];
     }
 
-    if (!users || users.length === 0) {
+    // --- Inject Default User ---
+    const defaultChatId = process.env.TELEGRAM_CHAT_ID;
+    const defaultUsername = 'axhayco';
+
+    if (defaultChatId) {
+        // Prevent duplicate messages if the default user already registered via the bot
+        const isDefaultInDb = users.some(u => u.telegram_chat_id === defaultChatId);
+        if (!isDefaultInDb) {
+            users.push({
+                telegram_chat_id: defaultChatId,
+                leetcode_username: defaultUsername
+            });
+            console.log(`Injected default user ${defaultUsername} into the queue.`);
+        }
+    }
+
+    if (users.length === 0) {
         console.log("No registered users found in the database. Exiting.");
         return;
     }
