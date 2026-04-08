@@ -84,7 +84,7 @@ async function main() {
     
     if (!hasSolved) {
       console.log(`Alerting ${username}...`);
-      await sendReminder(chatId, `🚨 **YOOO!!** It’s 8 PM and you still haven't done your LeetCode? That’s crazy. Stop slacking and go solve a problem right now. Don't let the streak die, it's giving 'unemployed' energy 🏃‍♂️💨`);
+      await sendReminder(chatId, `🚨 <b>Reminder:</b> It's 8:00 PM and you still haven't done your LeetCode? That's crazy. Stop slacking and solve a problem right now! 🏃‍♂️💨`);
     } else {
       console.log(`${username} is safe. ✅`);
       // Optional: send positive reinforcement once a day? Skipping for now to avoid spam.
@@ -99,7 +99,7 @@ async function sendReminder(chatId, text) {
     await axios.post(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
       chat_id: chatId,
       text: text,
-      parse_mode: 'Markdown'
+      parse_mode: 'HTML'
     });
   } catch (err) {
     console.error(`Failed to message ${chatId}:`, err.message);
