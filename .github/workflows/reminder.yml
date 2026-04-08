@@ -1,0 +1,32 @@
+name: LeetCode Daily Streak Check
+
+on:
+  schedule:
+    # 8:00 PM IST is 14:30 UTC (IST is UTC+5:30)
+    - cron: '30 14 * * *'
+  # Allows you to trigger the workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  check-streak:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Run LeetCode Streak Checker
+        env:
+          # Mapping the GitHub secrets to the environment variables our script expects
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: node index.js
