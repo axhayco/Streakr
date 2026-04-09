@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
         return await sendTelegram(
           TELEGRAM_TOKEN,
           chatId,
-          "❌ <b>Invalid Format!</b>\n\nPlease use <code>/settime HH:MM</code> (24-hour format, e.g., <code>/settime 21:00</code>)."
+          `❌ <b>Invalid Format!</b> You sent: "${text}"\n\nPlease use <code>/settime HH:MM</code> (24-hour format, e.g., <code>/settime 21:00</code>).`
         );
       }
       const newTime = timeMatch[2] + ':' + timeMatch[3];
@@ -61,7 +61,7 @@ module.exports = async (req, res) => {
       const parts = text.split(/\s+/);
       const username = parts[0];
       let newTime = '20:00';
-      
+
       if (parts.length > 1) {
         const timeMatch = parts[1].match(/^([01]\d|2[0-3]):([0-5]\d)$/);
         if (timeMatch) {
@@ -70,7 +70,7 @@ module.exports = async (req, res) => {
           return await sendTelegram(
             TELEGRAM_TOKEN,
             chatId,
-            "❌ <b>Invalid Format!</b>\n\nIf you want to set a time while registering, please use <code>username HH:MM</code> (24-hour format, e.g., <code>axhayco 21:00</code>)."
+            `❌ <b>Invalid Format!</b> You sent: "${text}"\n\nIf you want to set a time while registering, please use <code>username HH:MM</code> (24-hour format, e.g., <code>axhayco 21:00</code>).`
           );
         }
       }
@@ -84,7 +84,7 @@ module.exports = async (req, res) => {
 
       if (error) {
         // Send the error message directly to the chat so they aren't met with silence
-         await sendTelegram(
+        await sendTelegram(
           TELEGRAM_TOKEN,
           chatId,
           `❌ <b>Database Error:</b> ${error.message}\n\nDid you forget to add the 'reminder_time' column to your Supabase table?`
