@@ -138,7 +138,7 @@ async function main() {
 
         if (hasSubmittedToday) {
             console.log(`[${username}] Safe. Sending confirmation...`);
-            await sendTelegramMessage(chatId, `✅Ayy, streak secured! ✅ You actually cooked today. No cap, we love to see the grind. Sleep easy, bruhh ${username}. Keep it up!`);
+            await sendTelegramMessage(chatId, `✅Yoo, streak secured! ✅ You actually cooked today. No cap, we love to see the grind. Sleep easy, bruhh ${username}. Keep it up!`);
         } else {
             console.log(`[${username}] No submission found! Sending alert...`);
             await sendTelegramMessage(chatId, `🚨 Bro!! It’s 8 PM and you still haven't done your LeetCode? That’s crazy. Stop slacking and go solve a problem right now. Don't let the streak die, it's giving 'unemployed' energy 🏃‍♂️💨`);
