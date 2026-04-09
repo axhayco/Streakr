@@ -31,13 +31,37 @@ module.exports = async (req, res) => {
       await sendTelegram(
         TELEGRAM_TOKEN,
         chatId,
-        "<b>Welcome to Streakr!</b> 🚀\n\nI'll remind you every night at 8 PM IST if you haven't solved a LeetCode problem.\n\n<b>To register:</b> Reply with just your LeetCode username."
+        "<b>Welcome to Streakr!</b> 🚀\n\nI'll remind you to solve your LeetCode problem if you haven't done it by your set time (Default: 8 PM IST).\n\n<b>Commands:</b>\n1. Reply with your <b>LeetCode username</b> to register.\n2. <code>/settime HH:MM</code> to change reminder time (e.g. <code>/settime 21:30</code>)"
+      );
+    } else if (text.startsWith('/settime')) {
+      const timeMatch = text.match(/^(\/settime)\s+([01]\d|2[0-3]):([0-5]\d)$/);
+      if (!timeMatch) {
+        return await sendTelegram(
+          TELEGRAM_TOKEN,
+          chatId,
+          "❌ <b>Invalid Format!</b>\n\nPlease use <code>/settime HH:MM</code> (24-hour format, e.g., <code>/settime 21:00</code>)."
+        );
+      }
+      const newTime = timeMatch[2] + ':' + timeMatch[3];
+
+      const { error } = await supabase
+        .from('users')
+        .update({ reminder_time: newTime })
+        .eq('telegram_chat_id', chatId);
+
+      if (error) throw new Error(`DB error: ${error.message}`);
+
+      await sendTelegram(
+        TELEGRAM_TOKEN,
+        chatId,
+        `✅ <b>Time Updated!</b>\n\nYou'll now be nudged at <b>${newTime} IST</b> if you haven't solved a problem today.`
       );
     } else {
+      // Assume it's a username registration
       const { error } = await supabase
         .from('users')
         .upsert(
-          { telegram_chat_id: chatId, leetcode_username: text },
+          { telegram_chat_id: chatId, leetcode_username: text, reminder_time: '20:00' },
           { onConflict: 'telegram_chat_id' }
         );
 
@@ -46,7 +70,7 @@ module.exports = async (req, res) => {
       await sendTelegram(
         TELEGRAM_TOKEN,
         chatId,
-        `✅ <b>Registered!</b>\n\nNow tracking: <code>${text}</code>\n\nYou'll get a nudge at 8:00 PM IST if you haven't solved a problem today. Good luck! 💪`
+        `✅ <b>Registered!</b>\n\nNow tracking: <code>${text}</code>\n\nYou'll get a nudge at <b>8:00 PM IST</b> by default. Use <code>/settime HH:MM</code> to change it! 💪`
       );
     }
 
