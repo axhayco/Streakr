@@ -2,7 +2,7 @@ name: LeetCode Multi-User Streak Reminder
 
 on:
   schedule:
-    - cron: '40 12 * * *'  # 12:40 UTC = 18:10 IST (6:10 PM)
+   - cron: '32 12 * * *'  # 12:32 UTC = 18:02 IST
   workflow_dispatch:         # Manual trigger for testing
 
 jobs:
