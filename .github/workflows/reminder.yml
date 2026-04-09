@@ -2,9 +2,8 @@ name: LeetCode Multi-User Streak Reminder
 
 on:
   schedule:
-    # 16:30 UTC is exactly 8:00 PM (20:00) IST.
-    - cron: '30 16 * * *'
-  workflow_dispatch: # This allows you to run it manually to test
+    - cron: '30 14 * * *'   # 14:30 UTC = 20:00 IST (8 PM India)
+  workflow_dispatch:         # Manual trigger for testing
 
 jobs:
   check-streak:
@@ -16,14 +15,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Using a stable LTS version
+          node-version: '20'
 
       - name: Install Dependencies
         run: npm install
 
-      - name: Run Multi-User Check
-        # Point this to your new multi-user script
-        run: node checkAll.js 
+      - name: Run Streak Check
+        run: node checkAll.js
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
