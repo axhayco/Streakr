@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
   try {
-    if (text === '/start') {
+    if (text.startsWith('/start')) {
       await sendTelegram(
         TELEGRAM_TOKEN,
         chatId,
