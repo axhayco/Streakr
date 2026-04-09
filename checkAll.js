@@ -65,7 +65,22 @@ async function sendTelegram(chatId, text) {
 }
 
 async function main() {
-  console.log('--- STARTING DAILY STREAK CHECK ---');
+  console.log('--- STARTING STREAK CHECK ---');
+
+  // Current time in IST
+  const nowIST = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
+  const todayIST = nowIST.toISOString().slice(0, 10);
+  const currentTotalMinutes = nowIST.getUTCHours() * 60 + nowIST.getUTCMinutes(); // This is actually UTC, let's fix to IST
+
+  // Fix: get IST minutes correctly
+  const istHours = (nowIST.getUTCHours() + 5) + Math.floor((nowIST.getUTCMinutes() + 30) / 60);
+  const istMinutes = (nowIST.getUTCMinutes() + 30) % 60;
+  // Wait, simpler:
+  const istTimeStr = nowIST.toISOString().slice(11, 16); // "HH:MM"
+  const [h, m] = istTimeStr.split(':').map(Number);
+  const istTotalMinutes = h * 60 + m;
+
+  console.log(`Current IST Time: ${istTimeStr} (${istTotalMinutes} mins)`);
 
   const { data: users, error } = await supabase.from('users').select('*');
 
@@ -76,24 +91,29 @@ async function main() {
 
   let targetUsers = users || [];
 
-  // Inject default user if not already in DB
-  const defaultChatId = process.env.TELEGRAM_CHAT_ID;
-  const defaultUsername = 'axhayco';
-  if (defaultChatId && !targetUsers.some((u) => u.telegram_chat_id === defaultChatId)) {
-    targetUsers.push({ telegram_chat_id: defaultChatId, leetcode_username: defaultUsername });
-    console.log('Injected default user.');
-  }
+  // Filter users whose reminder_time matches the current window
+  // Window: reminder_time is between (currentTotalMinutes - 30) and currentTotalMinutes
+  targetUsers = targetUsers.filter(user => {
+    if (!user.reminder_time) return false; // Or default to 20:00?
+    const [rh, rm] = user.reminder_time.split(':').map(Number);
+    const userMinutes = rh * 60 + rm;
+
+    // Check if user's time is within the last 30 minutes (inclusive of current)
+    // This allows for cron frequency of 30 mins
+    const diff = (istTotalMinutes - userMinutes + 1440) % 1440;
+    return diff >= 0 && diff < 30;
+  });
 
   if (targetUsers.length === 0) {
-    console.log('No users found. Exiting.');
+    console.log('No users scheduled for this window. Exiting.');
     return;
   }
 
-  console.log(`Checking ${targetUsers.length} user(s)...`);
+  console.log(`Checking ${targetUsers.length} user(s) for the current window...`);
 
   for (const user of targetUsers) {
-    const { leetcode_username: username, telegram_chat_id: chatId } = user;
-    console.log(`Checking [${username}]...`);
+    const { leetcode_username: username, telegram_chat_id: chatId, reminder_time: userTime } = user;
+    console.log(`Checking [${username}] (Scheduled: ${userTime})...`);
 
     const solved = await checkLeetCode(username);
 
@@ -107,7 +127,7 @@ async function main() {
       console.log(`${username} ❌ no submission. Sending reminder.`);
       await sendTelegram(
         chatId,
-        `🚨 <b>Reminder:</b> It's 8 PM and you still haven't done your LeetCode, ${username}? Stop slacking. Go solve something right now 🏃‍♂️💨`
+        `🚨 <b>Reminder:</b> It's ${userTime} IST and you still haven't done your LeetCode, ${username}? Stop slacking. Go solve something right now 🏃‍♂️💨`
       );
     }
   }
