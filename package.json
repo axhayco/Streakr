@@ -1,10 +1,9 @@
 {
   "name": "leetcode-streak-reminder",
   "version": "1.0.0",
-  "description": "Script to check Leetcode profile and send telegram message",
-  "main": "index.js",
+  "description": "LeetCode streak reminder bot",
   "scripts": {
-    "start": "node index.js"
+    "start": "node checkAll.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.42.0",
