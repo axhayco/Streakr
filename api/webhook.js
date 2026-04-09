@@ -57,20 +57,45 @@ module.exports = async (req, res) => {
         `✅ <b>Time Updated!</b>\n\nYou'll now be nudged at <b>${newTime} IST</b> if you haven't solved a problem today.`
       );
     } else {
-      // Assume it's a username registration
+      // Assume Registration: could be just "username" or "username 21:00"
+      const parts = text.split(/\s+/);
+      const username = parts[0];
+      let newTime = '20:00';
+      
+      if (parts.length > 1) {
+        const timeMatch = parts[1].match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+        if (timeMatch) {
+          newTime = parts[1];
+        } else {
+          return await sendTelegram(
+            TELEGRAM_TOKEN,
+            chatId,
+            "❌ <b>Invalid Format!</b>\n\nIf you want to set a time while registering, please use <code>username HH:MM</code> (24-hour format, e.g., <code>axhayco 21:00</code>)."
+          );
+        }
+      }
+
       const { error } = await supabase
         .from('users')
         .upsert(
-          { telegram_chat_id: chatId, leetcode_username: text, reminder_time: '20:00' },
+          { telegram_chat_id: chatId, leetcode_username: username, reminder_time: newTime },
           { onConflict: 'telegram_chat_id' }
         );
 
-      if (error) throw new Error(`DB error: ${error.message}`);
+      if (error) {
+        // Send the error message directly to the chat so they aren't met with silence
+         await sendTelegram(
+          TELEGRAM_TOKEN,
+          chatId,
+          `❌ <b>Database Error:</b> ${error.message}\n\nDid you forget to add the 'reminder_time' column to your Supabase table?`
+        );
+        throw new Error(`DB error: ${error.message}`);
+      }
 
       await sendTelegram(
         TELEGRAM_TOKEN,
         chatId,
-        `✅ <b>Registered!</b>\n\nNow tracking: <code>${text}</code>\n\nYou'll get a nudge at <b>8:00 PM IST</b> by default. Use <code>/settime HH:MM</code> to change it! 💪`
+        `✅ <b>Registered!</b>\n\nNow tracking: <code>${username}</code>\n\nYou'll get a nudge at <b>${newTime} IST</b>. Use <code>/settime HH:MM</code> later if you ever want to change it! 💪`
       );
     }
 
