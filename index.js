@@ -127,10 +127,13 @@ async function main() {
 
     console.log(`Found ${users.length} users! Checking streaks...`);
 
-    // 3. Loop through each user and check their streak
+    // Filter users whose reminder_time matches the current window
+    // (If running index.js manually, maybe we just want to run for EVERYONE? Let's assume manual run checks everyone and reports their specific time)
+    // Wait, let's just make it show the customized time instead of 8 PM.
     for (const user of users) {
         const username = user.leetcode_username;
         const chatId = user.telegram_chat_id;
+        const userTime = user.reminder_time || '20:00';
 
         console.log(`\n--- Checking ${username} ---`);
 
@@ -141,10 +144,10 @@ async function main() {
             await sendTelegramMessage(chatId, `✅Ayy, streak secured! ✅ You actually cooked today. No cap, we love to see the grind. Sleep easy, bruhh ${username}. Keep it up!`);
         } else {
             console.log(`[${username}] No submission found! Sending alert...`);
-            await sendTelegramMessage(chatId, `🚨 Bro!! It’s 8 PM and you still haven't done your LeetCode? That’s crazy. Stop slacking and go solve a problem right now. Don't let the streak die, it's giving 'unemployed' energy 🏃‍♂️💨`);
+            await sendTelegramMessage(chatId, `🚨 Bro!! It’s ${userTime} IST and you still haven't done your LeetCode? That’s crazy. Stop slacking and go solve a problem right now. Don't let the streak die, it's giving 'unemployed' energy 🏃‍♂️💨`);
         }
     }
-    
+
     console.log("\nFinished processing all users.");
 }
 
