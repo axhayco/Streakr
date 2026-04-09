@@ -2,10 +2,7 @@ name: LeetCode Multi-User Streak Reminder
 
 on:
   schedule:
-    - cron: '30 12 * * *' # 6:00 PM IST
-    - cron: '30 14 * * *' # 8:00 PM IST
-    - cron: '30 16 * * *' # 10:00 PM IST
-    - cron: '30 18 * * *' # 12:00 AM IST
+   - cron: '*/30 * * * *'   # Runs every 30 minutes to check user-specific schedules
   workflow_dispatch:         # Manual trigger for testing
 
 jobs:
