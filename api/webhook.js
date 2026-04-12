@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
       await sendTelegram(
         TELEGRAM_TOKEN,
         chatId,
-        "<b>Welcome to Streakr!</b> 🚀\n\nI'll remind you every night at 8 PM IST if you haven't solved a LeetCode problem.\n\n<b>To register:</b> Reply with JUST your LeetCode username (e.g., <code>axhayco</code>)."
+        "<b>Welcome to Streakr!</b> 🚀\n\nI'll remind you every night if you haven't solved a LeetCode problem.\n\n<b>To register:</b> Reply with JUST your LeetCode username (e.g., <code>axhayco</code>)."
       );
     } else if (text.startsWith('/')) {
         await sendTelegram(TELEGRAM_TOKEN, chatId, "Unknown command. Just send your LeetCode username to register.");
@@ -61,7 +61,7 @@ module.exports = async (req, res) => {
       await sendTelegram(
         TELEGRAM_TOKEN,
         chatId,
-        `✅ <b>Registered!</b>\n\nNow tracking: <code>${text}</code>\n\nYou'll get a nudge at 8:00 PM IST if you haven't solved a problem today. Good luck! 💪`
+        `✅ <b>Registered!</b>\n\nNow tracking: <code>${text}</code>\n\nYou'll get a nudge before night if you haven't solved a problem today. Good luck! 💪`
       );
     }
 
