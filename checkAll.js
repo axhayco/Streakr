@@ -115,7 +115,7 @@ async function main() {
       console.log(`❌ ${username} no submission found. Sending reminder.`);
       await sendTelegram(
         chatId,
-        `🚨 <b>Reminder:</b> It's 8 PM and you still haven't done your LeetCode, ${username}? Stop slacking. Go solve something right now 🏃‍♂️💨`
+        `🚨 <b>Reminder:</b> You still haven't done your LeetCode, ${username}? Stop slacking. Go solve something right now 🏃‍♂️💨`
       );
     }
   }
