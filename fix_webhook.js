@@ -4,7 +4,7 @@ const axios = require('axios');
 // Token/secret now come from environment variables instead of being hardcoded.
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET; // must match Vercel env var of the same name
-const WEBHOOK_URL = 'https://streakr-phi.vercel.app/api/webhook'; // Clean URL
+
 
 if (!TELEGRAM_TOKEN) {
     console.error('❌ Missing TELEGRAM_TOKEN environment variable.');
