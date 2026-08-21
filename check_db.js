@@ -1,7 +1,16 @@
+require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 
-const SUPABASE_URL = 'https://twmusbvqxjwohfnmgfnr.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3bXVzYnZxeGp3b2hmbm1nZm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NTU0ODEsImV4cCI6MjA5MTIzMTQ4MX0.RnsCK_Qmz25zn-ZpsiQBEnfFRTRq0YrvW7SyWs7IwBY';
+// Secrets now come from environment variables (.env locally, GitHub Secrets in CI)
+// instead of being hardcoded in the file.
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.error('❌ Missing SUPABASE_URL or SUPABASE_KEY environment variables.');
+    console.error('   Create a .env file locally with these values, or set them as GitHub Secrets.');
+    process.exit(1);
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
